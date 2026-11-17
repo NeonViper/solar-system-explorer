@@ -1,0 +1,232 @@
+{
+ "enceladus": {
+  "status": "ok",
+  "saved": "enceladus.jpg",
+  "bytes": 203776,
+  "license": "Public domain (NASA)",
+  "title": "Map of Enceladus - December 2011",
+  "nasaId": "PIA14937",
+  "page": "https://images.nasa.gov/details/PIA14937",
+  "src": "https://images-assets.nasa.gov/image/PIA14937/PIA14937~medium.jpg"
+ },
+ "miranda": {
+  "status": "ok",
+  "saved": "miranda.jpg",
+  "bytes": 107520,
+  "license": "Public domain (NASA)",
+  "title": "Miranda - High Resolution Mosaic",
+  "nasaId": "PIA00043",
+  "page": "https://images.nasa.gov/details/PIA00043",
+  "src": "https://images-assets.nasa.gov/image/PIA00043/PIA00043~medium.jpg"
+ },
+ "hyperion": {
+  "status": "ok",
+  "saved": "hyperion.jpg",
+  "bytes": 37888,
+  "license": "Public domain (NASA)",
+  "title": "Odd Hyperion",
+  "nasaId": "PIA14583",
+  "page": "https://images.nasa.gov/details/PIA14583",
+  "src": "https://images-assets.nasa.gov/image/PIA14583/PIA14583~small.jpg"
+ },
+ "europa": {
+  "status": "ok",
+  "saved": "europa.jpg",
+  "width": 1016,
+  "height": 1125,
+  "license": "CC BY 3.0",
+  "title": "File:Geographic map Tyre Europa a.png",
+  "page": "https://commons.wikimedia.org/wiki/File%3AGeographic_map_Tyre_Europa_a.png",
+  "src": "https://commons.wikimedia.org/wiki/File%3AGeographic_map_Tyre_Europa_a.png"
+ },
+ "ganymede": {
+  "status": "ok",
+  "saved": "ganymede.jpg",
+  "width": 1800,
+  "height": 956,
+  "license": "Public domain",
+  "title": "File:Ganymede Global Geologic Map and Global Image Mosaic.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3AGanymede_Global_Geologic_Map_and_Global_Image_Mosaic.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3AGanymede_Global_Geologic_Map_and_Global_Image_Mosaic.jpg"
+ },
+ "callisto": {
+  "status": "ok",
+  "saved": "callisto.jpg",
+  "width": 8192,
+  "height": 4096,
+  "license": "CC BY-SA 3.0",
+  "title": "File:Callisto map by Askaniy.png",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACallisto_map_by_Askaniy.png",
+  "src": "https://commons.wikimedia.org/wiki/File%3ACallisto_map_by_Askaniy.png"
+ },
+ "titan": {
+  "status": "ok",
+  "saved": "titan.jpg",
+  "width": 4608,
+  "height": 2732,
+  "license": "Public domain",
+  "title": "File:First global geologic map of Titan (PIA23174).jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3AFirst_global_geologic_map_of_Titan_(PIA23174).jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3AFirst_global_geologic_map_of_Titan_(PIA23174).jpg"
+ },
+ "rhea": {
+  "status": "ok",
+  "saved": "rhea.jpg",
+  "width": 2000,
+  "height": 2000,
+  "license": "CC0",
+  "title": "File:Rhea moon 2.png",
+  "page": "https://commons.wikimedia.org/wiki/File%3ARhea_moon_2.png",
+  "src": "https://commons.wikimedia.org/wiki/File%3ARhea_moon_2.png"
+ },
+ "phoebe": {
+  "status": "ok",
+  "saved": "phoebe.jpg",
+  "width": 2048,
+  "height": 1024,
+  "license": "Public domain",
+  "title": "File:Phoebe map PIA07775 cropped.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3APhoebe_map_PIA07775_cropped.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3APhoebe_map_PIA07775_cropped.jpg"
+ },
+ "iapetus": {
+  "status": "ok",
+  "saved": "iapetus.jpg",
+  "width": 4680,
+  "height": 3818,
+  "license": "Public domain",
+  "title": "File:Iapetus map labelled.png",
+  "page": "https://commons.wikimedia.org/wiki/File%3AIapetus_map_labelled.png",
+  "src": "https://commons.wikimedia.org/wiki/File%3AIapetus_map_labelled.png"
+ },
+ "mimas": {
+  "status": "ok",
+  "saved": "mimas.jpg",
+  "width": 6330,
+  "height": 3756,
+  "license": "see page",
+  "title": "File:Map of Mimas 2017-01 PIA17214.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3AMap_of_Mimas_2017-01_PIA17214.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3AMap_of_Mimas_2017-01_PIA17214.jpg"
+ },
+ "dione": {
+  "status": "ok",
+  "saved": "dione.jpg",
+  "width": 6203,
+  "height": 3521,
+  "license": "Public domain",
+  "title": "File:Dione map 2011 PIA14914.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3ADione_map_2011_PIA14914.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3ADione_map_2011_PIA14914.jpg"
+ },
+ "tethys": {
+  "status": "ok",
+  "saved": "tethys.jpg",
+  "width": 3017,
+  "height": 1602,
+  "license": "Public domain",
+  "title": "File:Map of Tethys PIA 14931 Jun 2012.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3AMap_of_Tethys_PIA_14931_Jun_2012.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3AMap_of_Tethys_PIA_14931_Jun_2012.jpg"
+ },
+ "triton": {
+  "status": "ok",
+  "saved": "triton.jpg",
+  "width": 2127,
+  "height": 2047,
+  "license": "CC BY 4.0",
+  "title": "File:Triton Nomenclature Image.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3ATriton_Nomenclature_Image.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3ATriton_Nomenclature_Image.jpg"
+ },
+ "ariel": {
+  "status": "ok",
+  "saved": "ariel.jpg",
+  "width": 1440,
+  "height": 720,
+  "license": "Public domain",
+  "title": "File:Ariel map JPL USGS.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3AAriel_map_JPL_USGS.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3AAriel_map_JPL_USGS.jpg"
+ },
+ "umbriel": {
+  "status": "ok",
+  "saved": "umbriel.jpg",
+  "width": 1440,
+  "height": 720,
+  "license": "Public domain",
+  "title": "File:Umbriel map JPL USGS.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3AUmbriel_map_JPL_USGS.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3AUmbriel_map_JPL_USGS.jpg"
+ },
+ "titania": {
+  "status": "ok",
+  "saved": "titania.jpg",
+  "width": 1440,
+  "height": 720,
+  "license": "Public domain",
+  "title": "File:Titania map JPL USGS.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3ATitania_map_JPL_USGS.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3ATitania_map_JPL_USGS.jpg"
+ },
+ "oberon": {
+  "status": "ok",
+  "saved": "oberon.jpg",
+  "width": 1440,
+  "height": 720,
+  "license": "Public domain",
+  "title": "File:Oberon map JPL USGS.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOberon_map_JPL_USGS.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3AOberon_map_JPL_USGS.jpg"
+ },
+ "phobos": {
+  "status": "ok",
+  "saved": "phobos.jpg",
+  "width": 4096,
+  "height": 2048,
+  "license": "CC BY-SA 3.0",
+  "title": "File:Phobos map by Askaniy.png",
+  "page": "https://commons.wikimedia.org/wiki/File%3APhobos_map_by_Askaniy.png",
+  "src": "https://commons.wikimedia.org/wiki/File%3APhobos_map_by_Askaniy.png"
+ },
+ "deimos": {
+  "status": "ok",
+  "saved": "deimos.jpg",
+  "width": 4096,
+  "height": 2048,
+  "license": "CC BY-SA 3.0",
+  "title": "File:Deimos map by Askaniy.png",
+  "page": "https://commons.wikimedia.org/wiki/File%3ADeimos_map_by_Askaniy.png",
+  "src": "https://commons.wikimedia.org/wiki/File%3ADeimos_map_by_Askaniy.png"
+ },
+ "pluto": {
+  "status": "ok",
+  "saved": "pluto.jpg",
+  "width": 5926,
+  "height": 2963,
+  "license": "Public domain",
+  "title": "File:Pluto color mapmosaic.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3APluto_color_mapmosaic.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3APluto_color_mapmosaic.jpg"
+ },
+ "charon": {
+  "status": "ok",
+  "saved": "charon.jpg",
+  "width": 6000,
+  "height": 3000,
+  "license": "Public domain",
+  "title": "File:Charon map iau1803c.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACharon_map_iau1803c.jpg",
+  "src": "https://commons.wikimedia.org/wiki/File%3ACharon_map_iau1803c.jpg"
+ },
+ "proteus": {
+  "status": "ok",
+  "saved": "proteus.jpg",
+  "width": 3000,
+  "height": 2026,
+  "license": "Public domain",
+  "title": "File:Proteus Moon Earth.png",
+  "page": "https://commons.wikimedia.org/wiki/File%3AProteus_Moon_Earth.png",
+  "src": "https://commons.wikimedia.org/wiki/File%3AProteus_Moon_Earth.png"
+ }
+}

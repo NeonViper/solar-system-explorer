@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0f1a">
+<title>Solar System Explorer — Interactive 3D Astronomy</title>
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<div id="loading" class="loading">
+  <div class="loading-inner">
+    <div class="loading-ring"></div>
+    <div class="loading-title">SOLAR SYSTEM EXPLORER</div>
+    <div class="loading-sub" id="loadingMsg">Starting up…</div>
+  </div>
+</div>
+
+<div id="app" class="app">
+
+  <!-- ============ TOP BAR ============ -->
+  <header id="topbar" class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="5" fill="#ffcb6b"></circle>
+        <ellipse cx="20" cy="20" rx="16" ry="7" fill="none" stroke="#4fd1c5" stroke-width="1.1" opacity=".9"></ellipse>
+        <ellipse cx="20" cy="20" rx="10.5" ry="4.4" fill="none" stroke="#7aa2ff" stroke-width="1" opacity=".75"></ellipse>
+        <circle cx="35.4" cy="18" r="2.1" fill="#7aa2ff"></circle>
+      </svg>
+      <div class="brand-text">
+        <div class="brand-title">Solar System Explorer</div>
+        <div class="brand-sub">Keplerian ephemeris · local offline build</div>
+      </div>
+    </div>
+
+    <div class="clock" id="clockBlock">
+      <button class="clock-date" id="btnOpenDate" title="Change simulation date and time">
+        <span id="simDateLong">—</span>
+        <span class="clock-time" id="simTimeShort">--:--</span>
+      </button>
+      <div class="clock-meta">
+        <span id="simJD" title="Julian Date (TT-equivalent, used by the orbit solver)">JD —</span>
+        <span id="simTZ" title="Clock display offset applied to simulation time">UTC</span>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="pill pill-speed" id="speedPill" title="Current simulation rate">
+        <span class="pill-label">Rate</span><span class="pill-value" id="speedReadout">—</span>
+      </div>
+      <div class="pill pill-mode" id="modePill" title="Camera frame: heliocentric (Sun-centred) by default">
+        <span class="pill-label">Frame</span><span class="pill-value" id="frameReadout">Heliocentric</span>
+      </div>
+      <div class="pill pill-fps" id="fpsPill" title="Frames per second"><span class="pill-value" id="fpsMeter">–</span><span class="pill-label">fps</span></div>
+      <button class="icon-btn" id="btnHelp" title="Help and shortcuts">?</button>
+      <button class="icon-btn is-on" id="btnSettings" title="Toggle settings panel" aria-expanded="true">⚙</button>
+    </div>
+  </header>
+
+  <!-- ============ MIDDLE ROW ============ -->
+  <div class="midrow">
+  <!-- ============ LEFT RAIL ============ -->
+  <nav id="leftPanel" class="leftpanel" aria-label="Navigation and settings">
+    <div class="panel-scroll">
+
+      <section class="blk">
+        <div class="search-wrap">
+          <input id="searchInput" class="search" type="search" placeholder="Search planets & moons…" autocomplete="off" spellcheck="false">
+          <button id="btnClearSearch" class="search-clear" title="Clear search">×</button>
+        </div>
+        <div id="searchResults" class="search-results" hidden></div>
+      </section>
+
+      <section class="blk">
+        <button class="blk-head" data-collapse="bodies">
+          <span>Celestial bodies</span><span class="chev">▾</span>
+        </button>
+        <div class="blk-body" id="blk-bodies">
+          <div class="body-list" id="bodyList"></div>
+        </div>
+      </section>
+
+      <section class="blk">
+        <button class="blk-head" data-collapse="presets">
+          <span>View presets</span><span class="chev">▾</span>
+        </button>
+        <div class="blk-body" id="blk-presets">
+          <div class="btn-grid" id="presetGrid"></div>
+        </div>
+      </section>
+
+      <section class="blk">
+        <button class="blk-head" data-collapse="location">
+          <span>Location settings</span><span class="chev">▾</span>
+        </button>
+        <div class="blk-body" id="blk-location">
+          <p class="hint">Your location never changes where the planets really are — it only sets the observer
+            point on Earth used for the Earth-surface view and the altitude/azimuth readouts.</p>
+          <div class="field">
+            <label for="locName">Location name</label>
+            <input id="locName" type="text" value="Your location">
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="locLat">Latitude °</label><input id="locLat" type="number" step="0.0001" value="41.0082"></div>
+            <div class="field"><label for="locLon">Longitude °</label><input id="locLon" type="number" step="0.0001" value="28.9784"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="locElev">Elevation m</label><input id="locElev" type="number" step="1" value="40"></div>
+            <div class="field"><label for="locTz">UTC offset h</label><input id="locTz" type="number" step="0.25" value="3"></div>
+          </div>
+          <div class="field">
+            <label for="locPreset">Preset location</label>
+            <select id="locPreset"></select>
+          </div>
+          <div class="btn-row">
+            <button id="btnApplyLocation" class="btn btn-accent">Apply location</button>
+            <button id="btnUseDeviceTz" class="btn">Use my device clock</button>
+          </div>
+          <div class="field">
+            <label>Observer mode</label>
+            <div class="seg" id="obsModeSeg">
+              <button class="seg-btn is-on" data-obs="helio">Heliocentric</button>
+              <button class="seg-btn" data-obs="geo">Geocentric</button>
+              <button class="seg-btn" data-obs="topo">Earth surface</button>
+            </div>
+          </div>
+          <div class="readout" id="locReadout">—</div>
+        </div>
+      </section>
+
+      <section class="blk">
+        <button class="blk-head" data-collapse="orbits">
+          <span>Orbits &amp; labels</span><span class="chev">▾</span>
+        </button>
+        <div class="blk-body" id="blk-orbits">
+          <div class="check-grid">
+            <label class="chk"><input type="checkbox" id="optOrbitPlanets" checked><span>Planet orbits</span></label>
+            <label class="chk"><input type="checkbox" id="optOrbitDwarf" checked><span>Dwarf planet orbits</span></label>
+            <label class="chk"><input type="checkbox" id="optOrbitMoons"><span>Moon orbits</span></label>
+            <label class="chk"><input type="checkbox" id="optOrbitSelected"><span>Selected orbit only</span></label>
+            <label class="chk"><input type="checkbox" id="optLabels" checked><span>Name labels</span></label>
+            <label class="chk"><input type="checkbox" id="optLabelMoons"><span>Moon labels</span></label>
+            <label class="chk"><input type="checkbox" id="optTrails" checked><span>Motion trails</span></label>
+            <label class="chk"><input type="checkbox" id="optEclipticGrid"><span>Ecliptic grid</span></label>
+            <label class="chk"><input type="checkbox" id="optMarkers" checked><span>Selection markers</span></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="blk">
+        <button class="blk-head" data-collapse="scale">
+          <span>Visualization scale</span><span class="chev">▾</span>
+        </button>
+        <div class="blk-body" id="blk-scale">
+          <div class="seg" id="scaleModeSeg">
+            <button class="seg-btn" data-scale="real">Scientific scale</button>
+            <button class="seg-btn is-on" data-scale="explorer">Explorer mode</button>
+          </div>
+          <p class="hint" id="scaleHint">Explorer mode exaggerates body sizes so they are visible.
+            Calculated orbital positions are never altered by these controls.</p>
+          <div class="slider-row"><label>Planet size</label><input type="range" id="sizeScale" min="1" max="300" value="30"><output id="sizeScaleOut">30×</output></div>
+          <div class="slider-row"><label>Moon size</label><input type="range" id="moonSizeScale" min="1" max="1200" value="180"><output id="moonSizeScaleOut">180×</output></div>
+          <div class="slider-row"><label>Orbit distance</label><input type="range" id="distScale" min="1" max="100" value="8"><output id="distScaleOut">8×</output></div>
+          <div class="slider-row"><label>Moon orbit distance</label><input type="range" id="moonDistScale" min="1" max="3000" value="600"><output id="moonDistScaleOut">600×</output></div>
+          <div class="readout" id="scaleReadout">—</div>
+        </div>
+      </section>
+
+      <section class="blk">
+        <button class="blk-head" data-collapse="quality">
+          <span>Graphics &amp; rendering</span><span class="chev">▾</span>
+        </button>
+        <div class="blk-body" id="blk-quality">
+          <div class="seg" id="qualitySeg">
+            <button class="seg-btn" data-q="low">Low</button>
+            <button class="seg-btn" data-q="medium">Medium</button>
+            <button class="seg-btn is-on" data-q="high">High</button>
+            <button class="seg-btn" data-q="ultra">Ultra</button>
+          </div>
+          <div class="check-grid">
+            <label class="chk"><input type="checkbox" id="optBloom" checked><span>Glow / bloom</span></label>
+            <label class="chk"><input type="checkbox" id="optShadows" checked><span>Shadows</span></label>
+            <label class="chk"><input type="checkbox" id="optStars" checked><span>Star field</span></label>
+            <label class="chk"><input type="checkbox" id="optNebula" checked><span>Nebula backdrop</span></label>
+            <label class="chk"><input type="checkbox" id="optClouds" checked><span>Earth clouds</span></label>
+            <label class="chk"><input type="checkbox" id="optAtmo" checked><span>Atmosphere halos</span></label>
+          </div>
+          <div class="slider-row"><label>Sun glare</label><input type="range" id="glareScale" min="0" max="200" value="100"><output id="glareScaleOut">100%</output></div>
+          <div class="readout" id="gpuReadout">GPU: detecting…</div>
+        </div>
+      </section>
+
+      <section class="blk">
+        <button class="blk-head" data-collapse="accuracy">
+          <span>Astronomy data &amp; accuracy</span><span class="chev">▾</span>
+        </button>
+        <div class="blk-body" id="blk-accuracy">
+          <div class="readout" id="accuracyReadout">—</div>
+          <button id="btnRunChecks" class="btn btn-wide">Run orbital self-test vs JPL reference dates</button>
+          <div class="check-results" id="checkResults" hidden></div>
+        </div>
+      </section>
+
+    </div>
+  </nav>
+
+  <!-- ============ VIEWPORT ============ -->
+  <main id="viewport" class="viewport">
+    <div id="sceneHost"></div>
+    <div id="labelLayer" class="label-layer"></div>
+    <div id="hoverTip" class="hover-tip" hidden></div>
+
+    <div class="hud-tl" id="hudScaleNotice"></div>
+    <div class="hud-bl" id="hudHint">Left-drag rotate · wheel zoom · right-drag pan · click a body to inspect</div>
+    <div class="hud-tr">
+      <button class="mini-btn" id="btnResetCam" title="Reset camera to the full Solar System view">Reset view</button>
+      <button class="mini-btn" id="btnTopView" title="Look straight down on the ecliptic plane">Top view</button>
+      <button class="mini-btn" id="btnEdgeView" title="View the Solar System edge-on">Edge-on</button>
+      <button class="mini-btn" id="btnFollow" title="Keep the selected body centred while it moves">Follow</button>
+    </div>
+
+    <!-- date & time picker popover -->
+    <div class="popover" id="datePopover" hidden>
+      <div class="pop-head">
+        <span>Jump to date &amp; time</span>
+        <button class="pop-close" id="btnCloseDate">×</button>
+      </div>
+      <div class="pop-body">
+        <div class="field-row">
+          <div class="field"><label for="pickDate">Date</label><input id="pickDate" type="date"></div>
+          <div class="field"><label for="pickTime">Time (clock)</label><input id="pickTime" type="time" step="60"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="pickYear">Year scrub</label><input id="pickYear" type="number" step="1" min="-3000" max="3000"></div>
+          <div class="field"><label for="pickQuick">Quick jump</label>
+            <select id="pickQuick">
+              <option value="">choose…</option>
+              <option value="now">Now</option>
+              <option value="j2000">J2000.0 (2000-01-01 12:00 TT)</option>
+              <option value="moonlanding">Apollo 11 landing 1969-07-20</option>
+              <option value="cassini">Cassini arrival 2004-07-01</option>
+              <option value="newhorizons">New Horizons Pluto 2015-07-14</option>
+              <option value="perseid">Perseid maximum 2026-08-12</option>
+              <option value="eclipse">Solar eclipse 2026-08-12</option>
+              <option value="transit">Transit of Venus 2117-05-19? out of range</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label for="pickYearSlider">Year slider 1800 – 2050 (best-fit element range)</label>
+          <input id="pickYearSlider" type="range" min="1800" max="2050" step="0.01" value="2026"></div>
+        <div class="btn-row"><button class="btn btn-accent" id="btnGoDate">Go to date</button>
+          <button class="btn" id="btnNowDate">Now</button></div>
+      </div>
+    </div>
+  </main>
+  </div><!-- /midrow -->
+
+  <!-- ============ INFO PANEL ============ -->
+  <aside id="infoPanel" class="info" hidden aria-live="polite">
+    <div class="info-head">
+      <div class="info-swatch" id="infoSwatch"></div>
+      <div class="info-title-wrap">
+        <div class="info-kicker" id="infoKicker">—</div>
+        <h2 class="info-title" id="infoTitle">—</h2>
+        <div class="info-parent" id="infoParent"></div>
+      </div>
+      <button class="pop-close" id="btnCloseInfo" title="Close and return to the Solar System view">×</button>
+    </div>
+    <div class="info-tabs" id="infoTabs">
+      <button class="tab is-on" data-tab="facts">Physical</button>
+      <button class="tab" data-tab="orbit">Orbit</button>
+      <button class="tab" data-tab="world">World &amp; mission</button>
+      <button class="tab" data-tab="obs">From my location</button>
+    </div>
+    <div class="info-scroll" id="infoScroll"></div>
+    <div class="info-foot">
+      <button class="btn btn-wide" id="btnFocusBody">Focus camera on this body</button>
+      <div class="info-note" id="infoNote">—</div>
+    </div>
+  </aside>
+
+  <!-- ============ BOTTOM TIMELINE ============ -->
+  <footer id="bottombar" class="bottombar">
+    <div class="transport">
+      <button class="tbtn" id="btnRewFast" title="Slow down / step time backward">⏪</button>
+      <button class="tbtn" id="btnRev" title="Reverse time flow">◀</button>
+      <button class="tbtn tbtn-play" id="btnPlay" title="Play / pause the simulation">❚❚</button>
+      <button class="tbtn" id="btnFwd" title="Forward time">▶</button>
+      <button class="tbtn" id="btnFFFast" title="Speed up">⏩</button>
+      <button class="tbtn tbtn-alt" id="btnResetTime" title="Reset to the present moment">Now</button>
+    </div>
+    <div class="rate">
+      <select id="speedSel" title="Simulation rate"></select>
+      <input id="speedCustom" class="speed-custom" type="text" value="1 d/s" title="Custom rate: type e.g. '3 h/s', '0.5 d/s', '2000 y/s'">
+    </div>
+    <div class="timeline">
+      <div class="tl-labels"><span id="tlLeft">1800</span><span class="tl-mid" id="tlMid">timeline</span><span id="tlRight">2050</span></div>
+      <input id="timeScrubber" class="scrub" type="range" min="1800" max="2050" step="0.0027379" value="2026">
+      <div class="tl-ticks" id="tlTicks"></div>
+    </div>
+    <div class="cal">
+      <input id="dateInput" type="date" title="Simulation date">
+      <input id="timeInput" type="time" step="60" title="Simulation clock time">
+    </div>
+  </footer>
+
+  <div id="toastHost" class="toast-host"></div>
+</div>
+
+<!-- injected by app.js for the Earth-surface observer mode -->
+<div id="surfaceOverlay" class="surface-overlay" hidden>
+  <div class="so-hud">
+    <div class="so-line"><b>EARTH-SURFACE VIEW</b> · <span id="soWhere">—</span></div>
+    <div class="so-line">Local sidereal time <span id="soLst">—</span> · view centre alt <span id="soAlt">—</span> az <span id="soAz">—</span></div>
+  </div>
+  <div class="so-controls">
+    <button class="mini-btn" id="soPickNext">Next body in sky</button>
+    <button class="mini-btn" id="soLeave">Leave surface view</button>
+  </div>
+</div>
+
+<div id="helpModal" class="modal" hidden>
+  <div class="modal-card">
+    <div class="pop-head"><span>How to use Solar System Explorer</span><button class="pop-close" id="btnCloseHelp">×</button></div>
+    <div class="modal-body" id="helpBody"></div>
+  </div>
+</div>
+
+<!-- Everything below is loaded from disk: no CDN, no network needed after install. -->
+<script src="three.min.js"></script>
+<script src="assets/js/astro-data.js"></script>
+<script src="assets/js/astro-core.js"></script>
+<script src="assets/js/procedural.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
