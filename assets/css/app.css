@@ -326,11 +326,17 @@ body:has(.info:not([hidden])) .hud-tr{right:calc(min(392px,40vw) + 36px)}
   .hud-bl{display:none}
 }
 @media (max-width:900px){
-  .leftpanel{position:fixed;left:0;top:58px;bottom:74px;width:300px;transform:translateX(-102%);
+  .leftpanel{position:fixed;left:0;top:58px;bottom:96px;width:300px;transform:translateX(-102%);
     transition:transform .28s cubic-bezier(.22,1,.36,1)}
   .leftpanel.is-open{transform:none}
   .info{width:min(360px,94vw);max-height:52%}
   body:has(.info:not([hidden])) .hud-tr{right:calc(min(360px,94vw) + 36px)}
+  /* player controls: wrap and center — never clipped or overflowing */
+  .bottombar{flex:0 0 auto;height:auto;flex-wrap:wrap;justify-content:center;
+    gap:12px;row-gap:4px;padding:8px 12px}
+  .transport,.rate{flex:0 0 auto}
+  .timeline{flex:1 1 100%;order:5;min-width:0}
+  .tbtn,.tbtn-play{font-size:13px}
 }
 
 /* ---------- mobile / touch ---------- */
@@ -365,16 +371,20 @@ body:has(.info:not([hidden])) .hud-tr{right:calc(min(392px,40vw) + 36px)}
   /* info card becomes a bottom sheet */
   .info{top:auto;bottom:10px;left:10px;right:10px;width:auto;max-height:min(48vh,420px)}
 
-  /* player bar wraps to two rows and grows for thumbs */
+  /* player bar wraps to two rows and grows for thumbs; the circled rows
+     stretch edge-to-edge with equal-sized buttons */
   .bottombar{flex:0 0 auto;height:auto;flex-wrap:wrap;gap:8px;row-gap:3px;
     padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+  /* equal-sized, full-width control rows via grid (bulletproof vs. box-sizing) */
+  .transport{flex:1 1 100%;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+  .tbtn{width:auto;min-width:0;height:42px;font-size:14px}
+  .tbtn-play{width:auto}
+  .rate{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .rate select{width:auto;min-width:0}
+  .speed-custom{width:auto;min-width:0}
   .timeline{flex:1 1 100%;order:5;min-width:0}
   .cal{display:none}               /* date editor: clock popover + drawer */
-  .tbtn{width:42px;height:42px;font-size:14px}
-  .tbtn-play{width:50px}
-  .tbtn-alt{padding:0 14px}
-  .rate select{width:100px}
-  .speed-custom{width:72px}
+  .tbtn-alt{padding:0}
   input[type=range]{height:26px}   /* invisible hit-area growth for the scrubber */
   .scrub{height:26px}
 

@@ -89,6 +89,23 @@ const PROBES = () => {
   const hr = document.querySelector('.hud-tr').getBoundingClientRect();
   out.hudInfoClear = !(ir.left < hr.right - 2 && hr.left < ir.right - 2 &&
                        ir.top < hr.bottom - 2 && hr.top < ir.bottom - 2);
+  // 7. small screens: gear opens the drawer, no horizontal overflow,
+  //    transport row stretches edge-to-edge with equal buttons
+  if (window.innerWidth <= 900) {
+    document.getElementById('btnSettings').click();
+    out.drawerOpens = document.getElementById('leftPanel').classList.contains('is-open');
+    document.getElementById('btnSettings').click();
+    out.noHScroll = document.documentElement.scrollWidth <= window.innerWidth + 1;
+    if (window.innerWidth <= 760) {
+      const bt = document.getElementById('bottombar').getBoundingClientRect();
+      const tr = document.querySelector('.transport').getBoundingClientRect();
+      const rr = document.querySelector('.rate').getBoundingClientRect();
+      const widths = [].slice.call(document.querySelectorAll('.transport .tbtn'))
+                       .map(b => Math.round(b.getBoundingClientRect().width));
+      out.transportFullWidth = tr.width >= bt.width - 26 && rr.width >= bt.width - 26;
+      out.equalButtons = widths.every(w => Math.abs(w - widths[0]) <= 2);
+    }
+  }
   // focus the sun for the first screenshot
   S.selectBody('sun');
   return out;
@@ -106,10 +123,13 @@ async function boot(page) {
     'var ld=document.getElementById("loading"); ld && (ld.style.display==="none" || parseFloat(ld.style.opacity||"1")<0.05)',
     null, { timeout: 60000 });
 }
+/* undefined (feature not applicable to this device) counts as pass */
+function condOk(checks, key){ return checks[key] === undefined || checks[key] === true; }
 function verdict(checks, errors) {
   return checks && checks.aspectOk && checks.pinchIn && checks.pinchOut && checks.rotate &&
          checks.followLagAt1yPerSec < 1e-6 && !checks.bodiesMissing.length && checks.uiClock &&
-         checks.hudInfoClear && !errors.length
+         checks.hudInfoClear && condOk(checks, 'drawerOpens') && condOk(checks, 'noHScroll') &&
+         condOk(checks, 'transportFullWidth') && condOk(checks, 'equalButtons') && !errors.length
     ? 'PASS' : 'FAIL';
 }
 
@@ -169,11 +189,18 @@ function verdict(checks, errors) {
         S.cam.radiusWanted = S.auUnits() * 42; S.cam.targetWanted.set(0, 0, 0); });
       await page.waitForTimeout(3500);
       await page.screenshot({ path: path.join(OUT, d.name + '-3-full.png') });
+      if (d.width <= 900) {          /* prove the settings drawer actually opens */
+        await page.evaluate(() => document.getElementById('btnSettings').click());
+        await page.waitForTimeout(700);
+        await page.screenshot({ path: path.join(OUT, d.name + '-4-drawer.png') });
+      }
     } catch (e) { r.fatal = String(e && e.message).slice(0, 300); }
     r.errors = errors.slice(0, 6);
     r.ok = !r.fatal && r.checks && r.checks.aspectOk && r.checks.pinchIn && r.checks.pinchOut &&
            r.checks.rotate && r.checks.followLagAt1yPerSec < 1e-6 && !r.checks.bodiesMissing.length &&
-           !!r.checks.uiClock && r.checks.hudInfoClear && !errors.length;
+           !!r.checks.uiClock && r.checks.hudInfoClear &&
+            condOk(r.checks, 'drawerOpens') && condOk(r.checks, 'noHScroll') &&
+            condOk(r.checks, 'transportFullWidth') && condOk(r.checks, 'equalButtons') && !errors.length;
     results.push(r);
     await ctx.close();
     console.log(r.device.padEnd(12) + (r.ok ? 'PASS' : 'FAIL') + '  ' + JSON.stringify(r.checks || r.fatal || r.errors));

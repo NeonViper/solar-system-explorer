@@ -1791,10 +1791,33 @@
   $('helpModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
   $('btnSettings').addEventListener('click', function () {
     var app = document.querySelector('.app');
-    var hidden = app.classList.toggle('panel-hidden');
-    this.classList.toggle('is-on', !hidden);
-    this.setAttribute('aria-expanded', String(!hidden));
+    var lp = document.getElementById('leftPanel');
+    /* ≤900px the left panel is a slide-in drawer driven by .is-open;
+       wider screens use the in-flow .app.panel-hidden collapse */
+    if (window.matchMedia('(max-width:900px)').matches) {
+      var open = lp.classList.toggle('is-open');
+      this.classList.toggle('is-on', open);
+      this.setAttribute('aria-expanded', String(open));
+    } else {
+      var hidden = app.classList.toggle('panel-hidden');
+      this.classList.toggle('is-on', !hidden);
+      this.setAttribute('aria-expanded', String(!hidden));
+    }
     resize();
+  });
+  /* drawer starts closed on small screens: keep the gear state honest */
+  if (window.matchMedia('(max-width:900px)').matches) {
+    $('btnSettings').classList.remove('is-on');
+    $('btnSettings').setAttribute('aria-expanded', 'false');
+  }
+  /* tapping the 3D view closes an open drawer */
+  document.getElementById('viewport').addEventListener('pointerdown', function () {
+    var lp = document.getElementById('leftPanel');
+    if (lp.classList.contains('is-open')) {
+      lp.classList.remove('is-open');
+      $('btnSettings').classList.remove('is-on');
+      $('btnSettings').setAttribute('aria-expanded', 'false');
+    }
   });
 
   window.addEventListener('keydown', function (e) {
