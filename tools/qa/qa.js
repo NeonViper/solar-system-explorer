@@ -96,6 +96,11 @@ const PROBES = () => {
     out.drawerOpens = document.getElementById('leftPanel').classList.contains('is-open');
     document.getElementById('btnSettings').click();
     out.noHScroll = document.documentElement.scrollWidth <= window.innerWidth + 1;
+    // topbar must be exactly 58px so the drawer/search gap matches on all sizes
+    const tbr = document.querySelector('.topbar').getBoundingClientRect();
+    const sir = (document.querySelector('.search-wrap input') || {}).getBoundingClientRect
+      ? (document.querySelector('.search-wrap input') || document.querySelector('.search')).getBoundingClientRect() : null;
+    out.drawerGapOk = !!sir && Math.abs((sir.top - tbr.bottom) - 11) <= 2;
     if (window.innerWidth <= 760) {
       const bt = document.getElementById('bottombar').getBoundingClientRect();
       const tr = document.querySelector('.transport').getBoundingClientRect();
@@ -104,6 +109,9 @@ const PROBES = () => {
                        .map(b => Math.round(b.getBoundingClientRect().width));
       out.transportFullWidth = tr.width >= bt.width - 26 && rr.width >= bt.width - 26;
       out.equalButtons = widths.every(w => Math.abs(w - widths[0]) <= 2);
+      // pull tab present, and the open info card must clear the control bar
+      out.tabVisible = getComputedStyle(document.getElementById('barTab')).display !== 'none';
+      out.infoClearBar = ir.bottom <= bt.top + 4;
     }
   }
   // focus the sun for the first screenshot
@@ -129,7 +137,11 @@ function verdict(checks, errors) {
   return checks && checks.aspectOk && checks.pinchIn && checks.pinchOut && checks.rotate &&
          checks.followLagAt1yPerSec < 1e-6 && !checks.bodiesMissing.length && checks.uiClock &&
          checks.hudInfoClear && condOk(checks, 'drawerOpens') && condOk(checks, 'noHScroll') &&
-         condOk(checks, 'transportFullWidth') && condOk(checks, 'equalButtons') && !errors.length
+         condOk(checks, 'drawerGapOk') && condOk(checks, 'transportFullWidth') &&
+         condOk(checks, 'equalButtons') && condOk(checks, 'tabVisible') &&
+         condOk(checks, 'infoClearBar') && condOk(checks, 'barTabCollapses') &&
+         condOk(checks, 'barTabRestores') && condOk(checks, 'controlsHidden') &&
+         condOk(checks, 'gripStillVisible') && condOk(checks, 'infoClearBarStowed') && !errors.length
     ? 'PASS' : 'FAIL';
 }
 
@@ -194,13 +206,37 @@ function verdict(checks, errors) {
         await page.waitForTimeout(700);
         await page.screenshot({ path: path.join(OUT, d.name + '-4-drawer.png') });
       }
+      if (d.width <= 760) {          /* prove the pull tab stows the control bar */
+        const tapTab = () => page.evaluate(() => {
+          const t = document.getElementById('barTab'), r = t.getBoundingClientRect();
+          const o = { bubbles: true, cancelable: true, pointerId: 9, isPrimary: true,
+                      clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 };
+          t.dispatchEvent(new PointerEvent('pointerdown', o));
+          t.dispatchEvent(new PointerEvent('pointerup', o));
+          return document.querySelector('.app').classList.contains('bar-collapsed');
+        });
+        r.checks.barTabCollapses = await tapTab();
+        await page.waitForTimeout(450);
+        Object.assign(r.checks, await page.evaluate(() => {
+          const bar = document.getElementById('bottombar').getBoundingClientRect();
+          const tr = document.querySelector('.transport').getBoundingClientRect();
+          const i = document.getElementById('infoPanel');
+          return { controlsHidden: tr.top >= window.innerHeight - 2,
+                   gripStillVisible: bar.top < window.innerHeight - 10,
+                   infoClearBarStowed: i.hidden || i.getBoundingClientRect().bottom <= bar.top + 4 };
+        }));
+        await page.screenshot({ path: path.join(OUT, d.name + '-5-bar-down.png') });
+        const collapsedAgain = await tapTab();               /* restore */
+        r.checks.barTabRestores = !collapsedAgain;
+        await page.waitForTimeout(400);
+      }
     } catch (e) { r.fatal = String(e && e.message).slice(0, 300); }
     r.errors = errors.slice(0, 6);
     r.ok = !r.fatal && r.checks && r.checks.aspectOk && r.checks.pinchIn && r.checks.pinchOut &&
            r.checks.rotate && r.checks.followLagAt1yPerSec < 1e-6 && !r.checks.bodiesMissing.length &&
            !!r.checks.uiClock && r.checks.hudInfoClear &&
-            condOk(r.checks, 'drawerOpens') && condOk(r.checks, 'noHScroll') &&
-            condOk(r.checks, 'transportFullWidth') && condOk(r.checks, 'equalButtons') && !errors.length;
+            condOk(r.checks, 'drawerOpens') && condOk(r.checks, 'noHScroll') && condOk(r.checks, 'drawerGapOk') && condOk(r.checks, 'tabVisible') && condOk(r.checks, 'infoClearBar') &&
+            condOk(r.checks, 'transportFullWidth') && condOk(r.checks, 'equalButtons') && condOk(r.checks, 'barTabCollapses') && condOk(r.checks, 'barTabRestores') && condOk(r.checks, 'controlsHidden') && condOk(r.checks, 'gripStillVisible') && condOk(r.checks, 'infoClearBarStowed') && !errors.length;
     results.push(r);
     await ctx.close();
     console.log(r.device.padEnd(12) + (r.ok ? 'PASS' : 'FAIL') + '  ' + JSON.stringify(r.checks || r.fatal || r.errors));

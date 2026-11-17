@@ -1819,6 +1819,62 @@
       $('btnSettings').setAttribute('aria-expanded', 'false');
     }
   });
+  /* ---- phone-only pull tab on the player bar: tap or drag the grip to
+     stow the controls downward and give the info card the whole screen ---- */
+  (function () {
+    var tab = document.getElementById('barTab'), bar = document.getElementById('bottombar');
+    var app = document.querySelector('.app');
+    if (!tab || !bar) return;
+    var TABH = 26;                                   /* visible strip when stowed */
+    function mobile() { return window.matchMedia('(max-width:760px)').matches; }
+    function publish() {                             /* how tall the bar looks right now */
+      var collapsed = app.classList.contains('bar-collapsed');
+      document.documentElement.style.setProperty('--barh', (collapsed ? TABH : bar.offsetHeight) + 'px');
+      tab.setAttribute('aria-expanded', String(!collapsed));
+    }
+    if (window.ResizeObserver) new ResizeObserver(publish).observe(bar);
+    window.addEventListener('resize', publish);
+    publish();
+    var startY = 0, lastY = 0, moved = false, dragging = false;
+    tab.addEventListener('pointerdown', function (e) {
+      if (!mobile()) return;
+      dragging = true; moved = false; startY = lastY = e.clientY;
+      bar.style.transition = 'none';
+      try { tab.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    tab.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      lastY = e.clientY;
+      if (Math.abs(lastY - startY) > 6) moved = true;
+      var h = bar.offsetHeight - TABH;
+      var y = (app.classList.contains('bar-collapsed') ? h : 0) + (lastY - startY);
+      bar.style.transform = 'translateY(' + Math.max(0, Math.min(h, y)) + 'px)';
+    });
+    function release() {
+      if (!dragging) return;
+      dragging = false;
+      bar.style.transition = ''; bar.style.transform = '';
+      if (!mobile()) return;
+      var collapsed = app.classList.contains('bar-collapsed');
+      var h = Math.max(20, bar.offsetHeight - TABH), dy = lastY - startY;
+      if (!moved) collapsed = !collapsed;                    /* plain tap toggles */
+      else if (!collapsed && dy > h * 0.3) collapsed = true; /* pull down to stow */
+      else if (collapsed && dy < -h * 0.3) collapsed = false;/* pull up to restore */
+      app.classList.toggle('bar-collapsed', collapsed);
+      publish();
+    }
+    tab.addEventListener('pointerup', release);
+    tab.addEventListener('pointercancel', function () {
+      dragging = false; bar.style.transition = ''; bar.style.transform = '';
+    });
+    tab.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        app.classList.toggle('bar-collapsed');
+        publish();
+      }
+    });
+  })();
 
   window.addEventListener('keydown', function (e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') return;
