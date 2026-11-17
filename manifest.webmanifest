@@ -1,0 +1,18 @@
+{
+  "name": "Solar System Explorer",
+  "short_name": "SolarSys",
+  "description": "Interactive 3D solar system — Keplerian ephemeris, offline-first, runs entirely on your device.",
+  "id": "solar-system-explorer",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#05070e",
+  "theme_color": "#0a0f1a",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

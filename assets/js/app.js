@@ -1964,3 +1964,18 @@
     setTimeout(function () { ld.style.display = 'none'; }, 550);
   }, 350);
 })();
+
+/* ===================== 14. PWA service worker ===============================
+   Makes the app installable (Add to Home Screen / Install app) and fully
+   offline after the first visit. Registered on https origins; the QA harness
+   (or local testing) enables it on http via ?swdebug in the URL or
+   localStorage sse-sw=1. */
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  var devOn = false;
+  try { devOn = /[?&]swdebug/.test(location.search) || localStorage.getItem('sse-sw') === '1'; } catch (e) {}
+  if (location.protocol !== 'https:' && !devOn) return;
+  navigator.serviceWorker.register('sw.js').catch(function (err) {
+    if (window.console) console.warn('service worker registration failed:', err);
+  });
+})();

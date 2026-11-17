@@ -26,7 +26,8 @@ catch (e) {
     + '/node_modules/playwright').chromium;
 }
 const MIME = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
-  '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.png':'image/png', '.json':'application/json' };
+  '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.png':'image/png', '.json':'application/json',
+  '.webmanifest':'application/manifest+json' };
 
 fs.mkdirSync(OUT, { recursive: true });
 const server = http.createServer((req, res) => {
@@ -133,6 +134,8 @@ async function boot(page) {
 }
 /* undefined (feature not applicable to this device) counts as pass */
 function condOk(checks, key){ return checks[key] === undefined || checks[key] === true; }
+/* object check ({ok,why}): undefined counts as pass, otherwise .ok must be true */
+function objOk(checks, key){ return checks[key] === undefined || (checks[key] && checks[key].ok === true); }
 function verdict(checks, errors) {
   return checks && checks.aspectOk && checks.pinchIn && checks.pinchOut && checks.rotate &&
          checks.followLagAt1yPerSec < 1e-6 && !checks.bodiesMissing.length && checks.uiClock &&
@@ -141,7 +144,8 @@ function verdict(checks, errors) {
          condOk(checks, 'equalButtons') && condOk(checks, 'tabVisible') &&
          condOk(checks, 'infoClearBar') && condOk(checks, 'barTabCollapses') &&
          condOk(checks, 'barTabRestores') && condOk(checks, 'controlsHidden') &&
-         condOk(checks, 'gripStillVisible') && condOk(checks, 'infoClearBarStowed') && !errors.length
+         condOk(checks, 'gripStillVisible') && condOk(checks, 'infoClearBarStowed') &&
+         objOk(checks, 'pwaManifest') && condOk(checks, 'swRegistered') && !errors.length
     ? 'PASS' : 'FAIL';
 }
 
@@ -192,6 +196,40 @@ function verdict(checks, errors) {
       r.bootMs = Date.now() - t0;
       await page.waitForTimeout(d.width > 2000 ? 6000 : 4000);      // textures + first frames
       r.checks = await page.evaluate(PROBES);
+      /* PWA installability: manifest is valid JSON with required fields/icons,
+         every icon URL fetches, and (on phone-390) the service worker registers. */
+      r.checks.pwaManifest = await page.evaluate(async () => {
+        const link = document.querySelector('link[rel="manifest"]');
+        const apple = document.querySelector('link[rel="apple-touch-icon"]');
+        if (!link || !apple) return { ok: false, why: 'missing manifest or apple-touch-icon link' };
+        let m;
+        try {
+          const res = await fetch(link.getAttribute('href'));
+          if (!res.ok) return { ok: false, why: 'manifest fetch ' + res.status };
+          m = await res.json();
+        } catch (e) { return { ok: false, why: 'manifest parse: ' + e.message }; }
+        const icons = m.icons || [];
+        const anySize = (s) => icons.some(i => i.sizes === s && (!i.purpose || i.purpose.indexOf('any') >= 0));
+        if (!m.name || !m.start_url || m.display !== 'standalone' || !anySize('192x192') ||
+            !anySize('512x512') || !icons.some(i => i.purpose === 'maskable'))
+          return { ok: false, why: 'manifest missing required fields/icons' };
+        for (const src of icons.map(i => i.src).concat(apple.getAttribute('href'))) {
+          const r2 = await fetch(src);
+          if (!r2.ok) return { ok: false, why: 'icon ' + src + ' fetch ' + r2.status };
+        }
+        return { ok: true };
+      });
+      if (d.name === 'phone-390') {
+        const p2 = await ctx.newPage();
+        try {
+          await p2.goto('http://localhost:' + PORT + '/?swdebug=1', { waitUntil: 'commit', timeout: 20000 });
+          r.checks.swRegistered = await p2.evaluate(() => Promise.race([
+            navigator.serviceWorker.ready.then(reg => !!reg.active),
+            new Promise(res => setTimeout(() => res(false), 20000))
+          ]));
+        } catch (e) { r.checks.swRegistered = false; }
+        await p2.close();
+      }
       await page.waitForTimeout(2500);                               // focus glide onto the Sun
       await page.screenshot({ path: path.join(OUT, d.name + '-1-sun.png') });
       await page.evaluate(() => window.__SSE.selectBody('saturn'));
@@ -236,7 +274,7 @@ function verdict(checks, errors) {
            r.checks.rotate && r.checks.followLagAt1yPerSec < 1e-6 && !r.checks.bodiesMissing.length &&
            !!r.checks.uiClock && r.checks.hudInfoClear &&
             condOk(r.checks, 'drawerOpens') && condOk(r.checks, 'noHScroll') && condOk(r.checks, 'drawerGapOk') && condOk(r.checks, 'tabVisible') && condOk(r.checks, 'infoClearBar') &&
-            condOk(r.checks, 'transportFullWidth') && condOk(r.checks, 'equalButtons') && condOk(r.checks, 'barTabCollapses') && condOk(r.checks, 'barTabRestores') && condOk(r.checks, 'controlsHidden') && condOk(r.checks, 'gripStillVisible') && condOk(r.checks, 'infoClearBarStowed') && !errors.length;
+            condOk(r.checks, 'transportFullWidth') && condOk(r.checks, 'equalButtons') && condOk(r.checks, 'barTabCollapses') && condOk(r.checks, 'barTabRestores') && condOk(r.checks, 'controlsHidden') && condOk(r.checks, 'gripStillVisible') && condOk(r.checks, 'infoClearBarStowed') && objOk(r.checks, 'pwaManifest') && condOk(r.checks, 'swRegistered') && !errors.length;
     results.push(r);
     await ctx.close();
     console.log(r.device.padEnd(12) + (r.ok ? 'PASS' : 'FAIL') + '  ' + JSON.stringify(r.checks || r.fatal || r.errors));
