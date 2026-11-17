@@ -2,7 +2,7 @@
 
 An offline, WebGL solar-system simulator: Keplerian ephemerides computed **locally** (no network calls), rendered with Three.js, with 3D bodies, moons, rings, motion trails, orbit lines, labels, camera follow, timeline scrubbing and multiple observer frames (heliocentric / geocentric / surface).
 
-**[Live demo →](https://yonay.github.io/solar-system-explorer/)** *(placeholder — updated after first deploy)*
+**[Live demo →](https://neonviper.github.io/solar-system-explorer/)**
 
 ## Features
 

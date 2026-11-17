@@ -226,6 +226,10 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;b
   border:1px solid var(--line-strong);border-radius:14px;background:rgba(9,14,24,.92);
   box-shadow:var(--shadow);backdrop-filter:blur(16px);animation:slideIn .34s cubic-bezier(.22,1,.36,1)}
 @keyframes slideIn{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+/* when the info card is open it sits top-right over the HUD preset strip —
+   slide the strip clear to its left so the buttons stay reachable.
+   NOTE: #infoPanel is a sibling of .viewport, so the :has anchor is body */
+body:has(.info:not([hidden])) .hud-tr{right:calc(min(392px,40vw) + 36px)}
 .info-head{display:flex;gap:10px;align-items:flex-start;padding:13px 13px 10px;border-bottom:1px solid var(--line)}
 .info-swatch{width:36px;height:36px;border-radius:50%;flex:none;margin-top:3px;
   box-shadow:0 0 18px currentColor,inset 0 0 8px rgba(0,0,0,.5)}
@@ -318,6 +322,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;b
 @media (max-width:1180px){
   .leftpanel{flex-basis:272px}
   .info{width:min(340px,46vw)}
+  body:has(.info:not([hidden])) .hud-tr{right:calc(min(340px,46vw) + 36px)}
   .hud-bl{display:none}
 }
 @media (max-width:900px){
@@ -325,6 +330,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;b
     transition:transform .28s cubic-bezier(.22,1,.36,1)}
   .leftpanel.is-open{transform:none}
   .info{width:min(360px,94vw);max-height:52%}
+  body:has(.info:not([hidden])) .hud-tr{right:calc(min(360px,94vw) + 36px)}
 }
 
 /* ---------- mobile / touch ---------- */
@@ -337,7 +343,9 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;b
   .clock{margin-left:0}
   .clock-date{font-size:13px;padding:2px 8px}
   .clock-time{font-size:12px}
-  .topbar .pill-speed{display:none}
+  .topbar .pill-speed, .topbar .pill-mode, .topbar .pill-fps{display:none}
+  .topbar-right{gap:8px}
+  .topbar-right .icon-btn{flex:none}
   .icon-btn{width:42px;height:42px;flex:none;font-size:16px}
 
   /* settings drawer goes full height above the player */
@@ -347,7 +355,8 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;b
   /* viewport HUD: preset buttons in a wrapping row, touch-sized */
   .hud-tr{flex-direction:row;flex-wrap:wrap;justify-content:flex-end;gap:5px;
     max-width:calc(100% - 24px)}
-  .mini-btn{padding:8px 11px;font-size:11px}
+  body:has(.info:not([hidden])) .hud-tr{right:12px} /* info is a bottom sheet here */
+  .mini-btn{padding:7px 10px;font-size:10.5px}
   .hud-bl{display:block}           /* hints stay; JS swaps to touch wording */
   .hud-bl{bottom:8px;font-size:10px}
   .label{font-size:9.5px}

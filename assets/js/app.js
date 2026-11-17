@@ -131,6 +131,10 @@
   var scene = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(50, 1, 0.001, 4e8);
   scene.add(camera);
+  /* Sync renderer + camera projection with the viewport right away: the
+     default aspect of 1 stretches every sphere by the viewport's aspect
+     (≈1.8× on a 16:9 screen) until some later event called resize(). */
+  resize();
 
   var root = new THREE.Group();          // everything scaled lives here
   scene.add(root);
@@ -197,6 +201,10 @@
     camera.updateProjectionMatrix();
   }
   window.addEventListener('resize', resize);
+  /* Layout can change without any window resize event — the mobile player
+     bar wrapping to two rows, fullscreen, or the settings drawer settling —
+     so keep the projection glued to the host box whenever it changes. */
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(host);
 
   /* pointer controls on the canvas — mouse, pen and touch:
      1 finger drag = rotate · 2 finger pinch = zoom · right-drag/shift = pan
@@ -1834,6 +1842,11 @@
     }
 
     updatePositions(state.jd);
+    /* per-frame projection guard: any layout change (panel toggles, bottom
+       bar wrapping, fullscreen, rotation) that missed a resize event/observer
+       callback is caught here, so spheres are never stretched */
+    var hw = host.clientWidth, hh = host.clientHeight;
+    if (hw > 0 && hh > 0 && Math.abs(camera.aspect - hw / hh) > 1e-3) resize();
     updateCamera(dt);
     if (state.observerMode === 'topo' && topoSkyDirty) updateTopoSky(state.jd);
     updateMarker();
@@ -1863,7 +1876,7 @@
   updateCamera(0);
   renderer.render(scene, camera);
   setLoading('ready');
-  window.__SSE = { bodies: bodies, state: state, camera: camera, scene: scene, renderer: renderer, cam: cam, auUnits: auUnits, moonOrbitUnits: moonOrbitUnits, planetRadiusUnits: planetRadiusUnits };
+  window.__SSE = { bodies: bodies, state: state, camera: camera, scene: scene, renderer: renderer, cam: cam, auUnits: auUnits, moonOrbitUnits: moonOrbitUnits, planetRadiusUnits: planetRadiusUnits, selectBody: selectBody, deselect: deselect };
   requestAnimationFrame(frame);
   setTimeout(function () {
     var ld = $('loading');
